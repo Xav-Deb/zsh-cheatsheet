@@ -96,6 +96,15 @@ By default, the widget is bound to `Ctrl-x Ctrl-h`.
 - [x] Oh-My-Zsh & Plugin Manager compatibility.
 - [x] Update & Cache mechanism.
 
+### 🚀 Roadmap & Future Ideas
+
+- [ ] **Enhanced UI**: Add a dynamic preview window in `fzf` (using `bat` or `glow`).
+- [ ] **Alias Resolution**: Automatically detect help for aliases (e.g., `g` -> `git`).
+- [ ] **Shell Completion**: Native Zsh completion for the `zsh-cheatsheet` CLI.
+- [ ] **Custom Sources**: Support for multiple remote cheat sheet repositories.
+- [ ] **Quick Edit**: Add a command to quickly edit local cheat sheets.
+- [ ] **Usage Analytics**: Rank most used commands at the top of the list.
+
 ## 📄 License
 
 MIT © [Xav-Deb](https://github.com/Xav-Deb)
