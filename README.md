@@ -19,7 +19,20 @@ Searching for commands usually breaks your flow. You have to switch to a browser
 - 🔌 **Zero Bloat**: Minimal dependencies (`zsh` + `fzf`).
 - 🌐 **Offline First**: All documentation is stored locally.
 
-## 🚀 Quick Start (Example)
+## � Available Cheat Sheets
+
+The plugin comes with a rich library of pre-configured cheat sheets, including:
+
+- **Core Utils**: `find`, `grep`, `sed`, `awk`, `tar`, `rsync`, `curl`
+- **Network & SSH**: `ssh`, `scp`, `lsof`, `nc`, `dig`
+- **Dev Tools**: `git`, `docker`, `vim`, `tmux`, `zsh-cheatsheet`
+- **Languages & Frameworks**: `python`, `npm`, `go`
+- **Modern CLI**: `fd`, `rg`, `bat`, `fzf`
+- **Cloud & Ops**: `kubectl`, `ansible`
+
+Use `zsh-cheatsheet update` to fetch the latest versions!
+
+## �🚀 Quick Start (Example)
 
 1. You start typing a command:
 
