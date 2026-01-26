@@ -2,8 +2,12 @@
 
 # Global test runner for zsh-cheatsheet
 
-# 1. Shellcheck for scripts (if any scripts existed yet)
-# shellcheck *.zsh test/*.zsh
+# 1. Syntax check for Zsh scripts
+echo "Checking syntax for Zsh scripts..."
+for file in zsh-cheatsheet.plugin.zsh functions/* test/*.zsh; do
+    zsh -n "$file" || exit 1
+done
+echo "✅ Syntax check passed."
 
 # 2. Content validation
 zsh test/validate_content.zsh || exit 1

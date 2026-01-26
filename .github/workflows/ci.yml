@@ -30,7 +30,7 @@ jobs:
           brew install zsh fzf shellcheck markdownlint-cli
 
       - name: Lint Markdown
-        run: markdownlint cheats/*.md README.md zsh-cheatsheet.md
+        run: markdownlint cheats/*.md README.md
 
       - name: Run logic validation
         run: zsh test/run.sh
