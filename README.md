@@ -1,123 +1,141 @@
-# zsh-cheatsheet 🚀
+# 🚀 Zsh Cheatsheet — Essential Commands and Tricks
 
-**zsh-cheatsheet** is a lightweight Zsh plugin that delivers context-aware, interactive cheat sheets directly in your terminal.
-
-> **The right help, at the right time — without ever leaving your shell.**
+**zsh-cheatsheet** is a lightweight, context-aware interactive documentation tool for your terminal. It provides instant access to common commands and patterns through a native ZLE widget, ensuring you never have to leave your shell to look up syntax.
 
 ---
 
-## 💡 Why zsh-cheatsheet?
+## ⚡️ About the Project
 
-Searching for commands usually breaks your flow. You have to switch to a browser or find a static PDF. **zsh-cheatsheet** integrates with the **Zsh Line Editor (ZLE)** to provide instant help based on what you are currently typing.
+This repository serves two purposes:
 
-## ✨ Key Features
+1. **A Zsh Plugin**: A ZLE (Zsh Line Editor) integration that captures your current command and displays the relevant cheat sheet using `fzf`.
+2. **A Curated Database**: A collection of high-quality, practical Markdown cheat sheets for developers and power users.
 
-- 🏎️ **Native ZLE Widget**: Blazing fast integration with Zsh.
-- 🧠 **Context Aware**: It knows you're typing `git` and shows you the `git` cheat sheet.
-- 🔍 **Interactive UI**: Powered by `fzf` for fuzzy searching and instant selection.
-- 📝 **Markdown as Database**: Cheat sheets are simple Markdown files—easy to read, easy to contribute.
-- 🔌 **Zero Bloat**: Minimal dependencies (`zsh` + `fzf`).
-- 🌐 **Offline First**: All documentation is stored locally.
-
-## � Available Cheat Sheets
-
-The plugin comes with a rich library of pre-configured cheat sheets, including:
-
-- **Core Utils**: `find`, `grep`, `sed`, `awk`, `tar`, `rsync`, `curl`
-- **Network & SSH**: `ssh`, `scp`, `lsof`, `nc`, `dig`
-- **Dev Tools**: `git`, `docker`, `vim`, `tmux`, `zsh-cheatsheet`
-- **Languages & Frameworks**: `python`, `npm`, `go`
-- **Modern CLI**: `fd`, `rg`, `bat`, `fzf`
-- **Cloud & Ops**: `kubectl`, `ansible`
-
-Use `zsh-cheatsheet update` to fetch the latest versions!
-
-## �🚀 Quick Start (Example)
-
-1. You start typing a command:
-
-   ```sh
-   git chec█
-   ```
-
-2. Press `Ctrl-x` followed by `Ctrl-h` (**H**elp).
-3. The `git` cheat sheet opens instantly in `fzf`.
-4. Search, select, and press `Enter` to insert the command at your cursor.
+It is designed for speed, portability (macOS/Linux), and minimal friction.
 
 ---
 
-## 📦 Prerequisites
+## 🧭 Table of Contents
 
-Ensure you have the following installed:
+- [🚀 Quick Reference](#quick-reference)
+- [✨ Key Features](#key-features)
+- [🛠️ Getting Started](#getting-started)
+- [📦 Available Cheat Sheets](#available-cheat-sheets)
+- [🤝 Contributing](#contributing)
+- [📜 License](#license)
+
+---
+
+## Quick Reference
+
+| Action | Command |
+| :--- | :--- |
+| **Open Cheat Sheet** | `Ctrl-x` then `Ctrl-h` |
+| **Update Database** | `zsh-cheatsheet update` |
+| **Upgrade Plugin** | `zsh-cheatsheet upgrade` |
+| **Reload Plugin** | `zsh-cheatsheet reload` |
+
+---
+
+## Key Features
+
+- 🏎️ **Native ZLE Integration**: Faster than external aliases; works directly with your current buffer.
+- 🧠 **Context Aware**: Typing `git` and pressing the hotkey automatically opens the `git.md` sheet.
+- 🔍 **Fuzzy Search**: Powered by `fzf` for near-instant selection and filtering.
+- 📝 **Markdown-as-Database**: Easy to read, edit, and extend using standard formatting.
+- 🔌 **Zero Dependency**: Only requires `zsh` and `fzf`.
+
+---
+
+## Getting Started
+
+### Prerequisites
 
 - **Zsh (5.8+)**
 - **fzf**
 
-### Installation of dependencies
+### Installation
 
-#### macOS
+#### Using Oh-My-Zsh
 
-```sh
-# Core dependencies
-brew install zsh fzf
+1. Clone the repository into your custom plugins folder:
 
-# Development & Linting tools
-brew install shellcheck markdownlint-cli
-```
+   ```zsh
+   git clone https://github.com/Xav-Deb/zsh-cheatsheet.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-cheatsheet
+   ```
 
-#### Linux (Ubuntu/Debian)
+2. Add `zsh-cheatsheet` to your plugin list in `~/.zshrc`:
 
-```sh
-# Core dependencies
-sudo apt-get update
-sudo apt-get install -y zsh fzf
+   ```zsh
+   plugins=(... zsh-cheatsheet)
+   ```
 
-# Development & Linting tools
-sudo apt-get install -y shellcheck
-npm install -g markdownlint-cli
-```
+3. Restart your terminal or source your config:
 
-## 🛠 Installation (Planned)
+   ```zsh
+   source ~/.zshrc
+   ```
 
-Add this to your `.zshrc` (using your favorite plugin manager):
+#### Manual Installation
 
-```zsh
-# Using Zinit
-zinit light Xav-Deb/zsh-cheatsheet
+1. Clone the repository:
 
-# Using Oh-My-Zsh
-# 1. Clone into $ZSH_CUSTOM/plugins/zsh-cheatsheet
-# 2. Add zsh-cheatsheet to your plugins=(...) list
-```
+   ```zsh
+   git clone https://github.com/Xav-Deb/zsh-cheatsheet.git ~/.zsh-cheatsheet
+   ```
 
-By default, the widget is bound to `Ctrl-x Ctrl-h`.
+2. Source the plugin in your `~/.zshrc`:
 
-### Helpful Commands
+   ```zsh
+   echo "source ~/.zsh-cheatsheet/zsh-cheatsheet.plugin.zsh" >> ~/.zshrc
+   ```
 
-- `zsh-cheatsheet update`: Download/Update cheat sheets from the central repository.
-- `zsh-cheatsheet upgrade`: Check for plugin & cheat sheet updates and perform an interactive upgrade.
-- `zsh-cheatsheet reload`: Force reload of plugin functions (ideal after making changes).
+---
 
-> **Note**: The plugin automatically checks for updates once every 24 hours and will notify you in the terminal if a new version is available.
+## Available Cheat Sheets
 
-## 🚧 Project Status
+The plugin includes context-aware help for the following categories:
 
-- [x] Project architecture defined.
-- [x] Content validation suite implemented.
-- [x] ZLE Widget implementation.
-- [x] Advanced context detection (multi-word & prefix support).
-- [x] Oh-My-Zsh & Plugin Manager compatibility.
-- [x] Update & Cache mechanism.
+### 🛠️ Core Utils & Text
 
-### 🚀 Roadmap & Future Ideas
+`find`, `grep`, `sed`, `awk`, `tar`, `rsync`, `curl`
 
-- [ ] **Enhanced UI**: Add a dynamic preview window in `fzf` (using `bat` or `glow`).
-- [ ] **Alias Resolution**: Automatically detect help for aliases (e.g., `g` -> `git`).
-- [ ] **Shell Completion**: Native Zsh completion for the `zsh-cheatsheet` CLI.
-- [ ] **Custom Sources**: Support for multiple remote cheat sheet repositories.
-- [ ] **Quick Edit**: Add a command to quickly edit local cheat sheets.
-- [ ] **Usage Analytics**: Rank most used commands at the top of the list.
+### 🌐 Network & SSH
 
-## 📄 License
+`ssh`, `scp`, `lsof`, `nc`, `dig`
 
-MIT © [Xav-Deb](https://github.com/Xav-Deb)
+### 💻 Dev & Productivity
+
+`git`, `docker`, `vim`, `tmux`, `zsh-cheatsheet`
+
+### 🐍 Languages
+
+`python`, `npm`, `go`
+
+### 🚀 Modern CLI & Ops
+
+`fd`, `rg`, `bat`, `fzf`, `kubectl`, `ansible`
+
+---
+
+## Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create.
+
+1. **Fork** the Project.
+2. **Create** your Feature Branch (`git checkout -b feature/AmazingCheatSheet`).
+3. **Ensure** your file follows the [Markdown Contract](agents.md).
+4. **Confirm** with tests: `test/run.sh`.
+5. **Commit** your Changes (`git commit -m 'Add some AmazingCheatSheet'`).
+6. **Push** to the Branch.
+7. **Open** a Pull Request.
+
+---
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+*Built with ❤️ for the Zsh community.*
