@@ -1,0 +1,43 @@
+# zsh-cheatsheet-update function
+# Synchronizes cheat sheets from the central repository
+
+zsh-cheatsheet-update() {
+    local cache_dir="$ZSH_CHEATSHEET_CACHE/cheats"
+    local repo_api_url="https://api.github.com/repos/Xav-Deb/zsh-cheatsheet/contents/cheats"
+    local raw_url_base="https://raw.githubusercontent.com/Xav-Deb/zsh-cheatsheet/main/cheats"
+    
+    # Ensure cache directory exists
+    mkdir -p "$cache_dir"
+
+    echo "Fetching cheat sheets list from GitHub..."
+
+    local cheats=()
+    if (( $+commands[curl] )); then
+        # Fetch file list from GitHub API and extract .md filenames
+        cheats=($(curl -sSfL "$repo_api_url" | grep '"name":' | grep '\.md"' | cut -d'"' -f4))
+    elif (( $+commands[wget] )); then
+        cheats=($(wget -qO- "$repo_api_url" | grep '"name":' | grep '\.md"' | cut -d'"' -f4))
+    fi
+
+    if [[ ${#cheats} -eq 0 ]]; then
+        echo "Error: Could not fetch cheat sheets list. Check your internet connection or repository URL."
+        # Fallback to local defaults if API fails
+        cheats=(git.md tmux.md vim.md)
+    fi
+
+    echo "Updating ${#cheats} cheat sheets..."
+
+    local c
+    local success=0
+    local failed=0
+
+    for c in $cheats; do
+        if (( $+commands[curl] )); then
+            curl -sSfL "$raw_url_base/$c" -o "$cache_dir/$c" && ((success++)) || ((failed++))
+        elif (( $+commands[wget] )); then
+            wget -q "$raw_url_base/$c" -O "$cache_dir/$c" && ((success++)) || ((failed++))
+        fi
+    done
+
+    echo "Update complete: $success updated, $failed failed."
+}

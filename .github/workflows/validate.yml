@@ -1,0 +1,25 @@
+name: "Plugin Validation"
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Zsh
+      run: sudo apt-get update && sudo apt-get install -y zsh
+
+    - name: Run validation tests
+      run: zsh test/run.sh
+
+    - name: Run Markdown Lint
+      uses: davidanson/markdownlint-cli2-action@v16
+      with:
+        globs: "**/*.md"

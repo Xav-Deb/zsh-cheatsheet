@@ -1,0 +1,38 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project generated files
+plan-zshCheatsheet.prompt.md
+agents.md
+
+# Secrets and Credentials
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.yml
+credentials.json
+.netrc
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Development / Local config
+.vscode/
+.idea/
+*.swp
+*~
+node_modules/
+dist/
+build/
+.cache/

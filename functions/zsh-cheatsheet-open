@@ -1,0 +1,96 @@
+# zsh-cheatsheet-open widget function
+
+zsh-cheatsheet-open() {
+    # Extract all words from the current line buffer and get the last one
+    local words=("${(z)LBUFFER}")
+    local target_cmd="${words[-1]}"
+    local selected
+    
+    # Search paths for cheat sheets
+    local search_dirs=("$ZSH_CHEATSHEET_CACHE/cheats" "$ZSH_CHEATSHEET_DIR/cheats")
+    local cheat_file=""
+
+    # 1. Search for a specific cheat sheet for the last word
+    if [[ -n "$target_cmd" ]]; then
+        local d
+        for d in $search_dirs; do
+            if [[ -f "$d/${target_cmd}.md" ]]; then
+                cheat_file="$d/${target_cmd}.md"
+                break
+            fi
+        done
+    fi
+
+    # 2. If found, show entries for that command
+    if [[ -n "$cheat_file" ]]; then
+        local current_category="General"
+        local entries=()
+        while IFS= read -r line; do
+            if [[ "$line" =~ "^# " ]]; then
+                continue # Skip H1
+            elif [[ "$line" =~ "^## (.*)" ]]; then
+                current_category="${match[1]}"
+            elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
+                local cmd_part="${match[1]}"
+                local desc_part="${match[2]}"
+                # Format: [Category] cmd — description (keep it searchable)
+                entries+=("[$current_category] - \`$cmd_part\` — $desc_part")
+            fi
+        done < "$cheat_file"
+
+        if [[ ${#entries} -gt 0 ]]; then
+            selected=$(printf "%s\n" "${entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="Cheat $target_cmd > ")
+        fi
+    fi
+
+    # 3. Fallback: show all available cheat sheets
+    if [[ -z "$selected" ]]; then
+        local all_entries=()
+        local d
+        for d in $search_dirs; do
+            [[ ! -d "$d" ]] && continue
+            local cheats=($d/*.md(N))
+            local file
+            for file in $cheats; do
+                local filename=$(basename "$file" .md)
+                local current_category="General"
+                while IFS= read -r line; do
+                    if [[ "$line" =~ "^# " ]]; then
+                        continue
+                    elif [[ "$line" =~ "^## (.*)" ]]; then
+                        current_category="${match[1]}"
+                    elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
+                        local cmd_part="${match[1]}"
+                        local desc_part="${match[2]}"
+                        all_entries+=("$filename [$current_category] - \`$cmd_part\` — $desc_part")
+                    fi
+                done < "$file"
+            done
+        done
+
+        if [[ ${#all_entries} -gt 0 ]]; then
+            selected=$(printf "%s\n" "${all_entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="All Cheats > ")
+        fi
+    fi
+
+    # 4. Insert selected command
+    if [[ -n "$selected" ]]; then
+        # Extract command between backticks
+        local cmd_to_insert="${selected#*- \`}"
+        cmd_to_insert="${cmd_to_insert%%\`*}"
+
+        if [[ -n "$cmd_to_insert" ]]; then
+            # If target_cmd was matched and is at the end of LBUFFER, replace it
+            if [[ -n "$target_cmd" && "$LBUFFER" == *"$target_cmd" ]]; then
+                LBUFFER="${LBUFFER%$target_cmd}${cmd_to_insert}"
+            else
+                # Otherwise append (with a leading space if not already there)
+                [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
+                LBUFFER+="${cmd_to_insert}"
+            fi
+        fi
+    fi
+
+    # Refresh the display to show the new buffer
+    zle reset-prompt
+}
