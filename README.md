@@ -82,7 +82,10 @@ By default, the widget is bound to `Ctrl-h`.
 ### Helpful Commands
 
 - `zsh-cheatsheet update`: Download/Update cheat sheets from the central repository.
+- `zsh-cheatsheet upgrade`: Check for plugin & cheat sheet updates and perform an interactive upgrade.
 - `zsh-cheatsheet reload`: Force reload of plugin functions (ideal after making changes).
+
+> **Note**: The plugin automatically checks for updates once every 24 hours and will notify you in the terminal if a new version is available.
 
 ## 🚧 Project Status
 

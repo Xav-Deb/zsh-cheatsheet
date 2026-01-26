@@ -1,0 +1,40 @@
+# zsh-cheatsheet-upgrade function
+# Checks for updates and handles the upgrade process
+
+zsh-cheatsheet-upgrade() {
+    local plugin_dir="$ZSH_CHEATSHEET_DIR"
+    local cache_dir="$ZSH_CHEATSHEET_CACHE"
+    local check_file="$cache_dir/last_check"
+
+    # 1. Check for plugin updates (Git)
+    if [[ -d "$plugin_dir/.git" ]]; then
+        echo "Checking for plugin updates..."
+        cd "$plugin_dir" || return 1
+        git fetch origin main &>/dev/null
+        local local_hash=$(git rev-parse HEAD)
+        local remote_hash=$(git rev-parse origin/main)
+
+        if [[ "$local_hash" != "$remote_hash" ]]; then
+            echo "✨ A new version of the plugin is available!"
+            echo -n "Would you like to upgrade now? (y/N) "
+            read -r opt
+            if [[ "$opt" =~ ^[yY]$ ]]; then
+                git pull origin main
+                echo "✅ Plugin updated successfully."
+                # Reload functions after upgrade
+                zsh-cheatsheet reload
+            fi
+        else
+            echo "✅ Plugin is already up to date."
+        fi
+        cd - &>/dev/null
+    fi
+
+    # 2. Check for cheats updates
+    echo "Checking for cheat sheet updates..."
+    zsh-cheatsheet-update
+
+    # Update timestamp
+    mkdir -p "$cache_dir"
+    date +%s > "$check_file"
+}
