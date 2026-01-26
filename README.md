@@ -27,7 +27,7 @@ Searching for commands usually breaks your flow. You have to switch to a browser
    git chec█
    ```
 
-2. Press `Ctrl-h` (**H**elp).
+2. Press `Ctrl-x` followed by `Ctrl-h` (**H**elp).
 3. The `git` cheat sheet opens instantly in `fzf`.
 4. Search, select, and press `Enter` to insert the command at your cursor.
 
@@ -77,7 +77,7 @@ zinit light Xav-Deb/zsh-cheatsheet
 # 2. Add zsh-cheatsheet to your plugins=(...) list
 ```
 
-By default, the widget is bound to `Ctrl-h`.
+By default, the widget is bound to `Ctrl-x Ctrl-h`.
 
 ### Helpful Commands
 

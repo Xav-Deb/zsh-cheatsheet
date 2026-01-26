@@ -75,6 +75,6 @@ zsh-cheatsheet() {
 # Run silent check when shell starts
 zsh-cheatsheet-check-updates
 
-# Default keybinding: ^H (Ctrl-H)
+# Default keybinding: ^X^H (Ctrl-X, Ctrl-H)
 # User can override this by binding to zsh-cheatsheet-open themselves
-bindkey '^H' zsh-cheatsheet-open
+bindkey '^X^H' zsh-cheatsheet-open
