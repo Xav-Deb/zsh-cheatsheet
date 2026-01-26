@@ -14,8 +14,17 @@ zsh-cheatsheet-open() {
     if [[ -n "$target_cmd" ]]; then
         local d
         for d in $search_dirs; do
+            # Try exact match first
             if [[ -f "$d/${target_cmd}.md" ]]; then
                 cheat_file="$d/${target_cmd}.md"
+                break
+            fi
+            # Try prefix match if no exact match found
+            local matches=($d/${target_cmd}*.md(N))
+            if [[ ${#matches} -gt 0 ]]; then
+                cheat_file="${matches[1]}"
+                # Update target_cmd to the actual found filename (without .md)
+                target_cmd=$(basename "$cheat_file" .md)
                 break
             fi
         done
@@ -80,11 +89,23 @@ zsh-cheatsheet-open() {
         cmd_to_insert="${cmd_to_insert%%\`*}"
 
         if [[ -n "$cmd_to_insert" ]]; then
-            # If target_cmd was matched and is at the end of LBUFFER, replace it
-            if [[ -n "$target_cmd" && "$LBUFFER" == *"$target_cmd" ]]; then
-                LBUFFER="${LBUFFER%$target_cmd}${cmd_to_insert}"
+            # Clean LBUFFER by removing trailing spaces
+            local clean_lbuffer="${LBUFFER%% #}"
+            
+            # Simple check: Does the start of cmd_to_insert match the end of clean_lbuffer?
+            # We want to replace the part that is already there.
+            
+            # Case 1: The current buffer is exactly the start of the command (or equal)
+            if [[ -n "$clean_lbuffer" && "$cmd_to_insert" == "$clean_lbuffer"* ]]; then
+                LBUFFER="${cmd_to_insert}"
+            # Case 2: The current command/prefix is part of the command chosen
+            # We check if the last word (target_cmd) is the beginning of cmd_to_insert
+            elif [[ -n "$target_cmd" && "$cmd_to_insert" == "$target_cmd"* ]]; then
+                # Get everything before target_cmd in clean_lbuffer
+                local prefix="${clean_lbuffer%$target_cmd}"
+                LBUFFER="${prefix}${cmd_to_insert}"
             else
-                # Otherwise append (with a leading space if not already there)
+                # Default: Append with space
                 [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
                 LBUFFER+="${cmd_to_insert}"
             fi
