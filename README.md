@@ -21,6 +21,7 @@ It is designed for speed, portability (macOS/Linux), and minimal friction.
 - [✨ Key Features](#key-features)
 - [🛠️ Getting Started](#getting-started)
 - [📦 Available Cheat Sheets](#available-cheat-sheets)
+- [🚧 Roadmap & Status](#roadmap--status)
 - [🤝 Contributing](#contributing)
 - [📜 License](#license)
 
@@ -115,6 +116,28 @@ The plugin includes context-aware help for the following categories:
 ### 🚀 Modern CLI & Ops
 
 `fd`, `rg`, `bat`, `fzf`, `kubectl`, `ansible`
+
+---
+
+## Roadmap & Status
+
+### Current Progress
+
+- [x] **Project Architecture**: Core ZLE & function structure.
+- [x] **Content Validation**: Automated tests for Markdown compliance.
+- [x] **Fuzzy Engine**: Robust `fzf` integration with real-time filtering.
+- [x] **Context Awareness**: Multi-word detection and prefix matching.
+- [x] **Compatibility**: Oh-My-Zsh & standard Zsh support.
+- [x] **Update Mechanism**: CLI tools for sheet and plugin updates.
+
+### Future Ideas & Optimizations
+
+- [ ] **Enhanced UI**: Dynamic preview window using `bat` or `glow`.
+- [ ] **Alias Resolution**: Automatically resolve aliases (e.g., `g` -> `git`).
+- [ ] **Shell Completion**: Native Zsh completions for the `zsh-cheatsheet` CLI.
+- [ ] **Custom Sources**: Support for user-defined remote repositories.
+- [ ] **Local Quick Edit**: Instantly edit a cheat sheet during usage.
+- [ ] **Smart Ranking**: Prioritize most-used commands in the selection list.
 
 ---
 
