@@ -14,9 +14,19 @@
 ## Rebase
 
 - `git rebase <branch>` — Rebase onto branch
+- `git rebase -i HEAD~[n]` — Interactive rebase of last [n] commits
+- `git rebase --abort` — Abort a rebase in progress
 
-```sh
-git rebase -i HEAD~3
-```
+## Stash & Safety
 
-> ⚠️ Avoid rebasing public branches
+- `git stash` — Stash uncommitted changes
+- `git stash pop` — Apply and remove last stash
+- `git stash list` — Show all stashes
+- `git reflog` — Show history of HEAD (rescue lost commits)
+- `git cherry-pick <hash>` — Apply a specific commit to current branch
+
+## Remotes
+
+- `git remote -v` — List all remotes
+- `git remote add origin <url>` — Add a new remote
+- `git fetch --all --prune` — Sync with remote and remove dead branches
