@@ -33,9 +33,17 @@ zsh-cheatsheet-update() {
 
     for c in $cheats; do
         if (( $+commands[curl] )); then
-            curl -sSfL "$raw_url_base/$c" -o "$cache_dir/$c" && ((success++)) || ((failed++))
+            if curl -sSfL "$raw_url_base/$c" -o "$cache_dir/$c"; then
+                ((success++))
+            else
+                ((failed++))
+            fi
         elif (( $+commands[wget] )); then
-            wget -q "$raw_url_base/$c" -O "$cache_dir/$c" && ((success++)) || ((failed++))
+            if wget -q "$raw_url_base/$c" -O "$cache_dir/$c"; then
+                ((success++))
+            else
+                ((failed++))
+            fi
         fi
     done
 
