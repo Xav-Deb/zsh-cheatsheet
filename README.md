@@ -84,13 +84,6 @@ By default, the widget is bound to `Ctrl-h`.
 - `zsh-cheatsheet update`: Download/Update cheat sheets from the central repository.
 - `zsh-cheatsheet reload`: Force reload of plugin functions (ideal after making changes).
 
----
-
-## 🤖 AI-Assisted Development
-
-This project is optimized for AI-assisted coding (GitHub Copilot, Cursor, etc.).
-If you are an agent or a developer using one, please refer to [agents.md](agents.md) for the project's technical "contract" and system prompts.
-
 ## 🚧 Project Status
 
 - [x] Project architecture defined.
