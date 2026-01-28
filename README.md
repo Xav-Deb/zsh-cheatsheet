@@ -1,78 +1,53 @@
-# 🚀 Zsh Cheatsheet — Essential Commands and Tricks
+# 🚀 Zsh Cheatsheet
 
-**zsh-cheatsheet** is a lightweight, context-aware interactive documentation tool for your terminal. It provides instant access to common commands and patterns through a native ZLE widget, ensuring you never have to leave your shell to look up syntax.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Zsh Version](https://img.shields.io/badge/Zsh-5.8%2B-blue.svg)](https://www.zsh.org/)
+[![fzf](https://img.shields.io/badge/Dependency-fzf-orange.svg)](https://github.com/junegunn/fzf)
 
----
-
-## ⚡️ About the Project
-
-This repository serves two purposes:
-
-1. **A Zsh Plugin**: A ZLE (Zsh Line Editor) integration that captures your current command and displays the relevant cheat sheet using `fzf`.
-2. **A Curated Database**: A collection of high-quality, practical Markdown cheat sheets for developers and power users.
-
-It is designed for speed, portability (macOS/Linux), and minimal friction.
+**zsh-cheatsheet** is a lightweight Zsh plugin that provides context-aware interactive cheat sheets directly in your terminal. Using ZLE (Zsh Line Editor) and `fzf`, it gives you instant access to your command documentation without leaving the command line.
 
 ---
 
-## 🧭 Table of Contents
+## 🛠️ Technology Stack
 
-- [🚀 Quick Reference](#quick-reference)
-- [✨ Key Features](#key-features)
-- [🛠️ Getting Started](#getting-started)
-- [📦 Available Cheat Sheets](#available-cheat-sheets)
-- [🚧 Roadmap & Status](#roadmap--status)
-- [🤝 Contributing](#contributing)
-- [📜 License](#license)
+- **Language**: [Zsh](https://www.zsh.org/) (Version 5.8 or higher required).
+- **Fuzzy Finder**: [fzf](https://github.com/junegunn/fzf).
+- **Database**: Markdown (`.md`) files parsed on-the-fly.
+- **Integration**: Zsh Line Editor (ZLE) for native command buffer interaction.
 
 ---
 
-## Quick Reference
+## 🏗️ Project Architecture
 
-| Action | Command |
-| :--- | :--- |
-| **Open Cheat Sheet** | `Ctrl-x` then `Ctrl-h` |
-| **Update Database** | `zsh-cheatsheet update` |
-| **Upgrade Plugin** | `zsh-cheatsheet upgrade` |
-| **Reload Plugin** | `zsh-cheatsheet reload` |
+The project follows a simple and high-performance architecture, prioritizing Zsh internal mechanisms:
 
----
-
-## Key Features
-
-- 🏎️ **Native ZLE Integration**: Faster than external aliases; works directly with your current buffer.
-- 🧠 **Context Aware**: Typing `git` and pressing the hotkey automatically opens the `git.md` sheet.
-- 🔍 **Fuzzy Search**: Powered by `fzf` for near-instant selection and filtering.
-- 📝 **Markdown-as-Database**: Easy to read, edit, and extend using standard formatting.
-- 🔌 **Zero Dependency**: Only requires `zsh` and `fzf`.
+- **ZLE Integration**: The plugin registers a `zsh-cheatsheet-open` widget that interacts directly with `$BUFFER` and `$LBUFFER`.
+- **Markdown-as-Database**: Cheat sheets are stored in the `cheats/` directory. Each file follows a strict formatting contract for ultra-fast parsing without heavy external tools.
+- **Autoloadable Functions**: Business logic is decoupled into autoloadable functions in `functions/`, ensuring minimal shell startup time.
+- **Context Awareness**: The plugin automatically detects the command being typed to open the relevant documentation directly.
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
 - **Zsh (5.8+)**
-- **fzf**
+- **fzf** installed and available in your `$PATH`.
 
 ### Installation
 
-#### Using Oh-My-Zsh
+#### Via Oh-My-Zsh
 
 1. Clone the repository into your custom plugins folder:
-
    ```zsh
    git clone https://github.com/Xav-Deb/zsh-cheatsheet.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-cheatsheet
    ```
-
-2. Add `zsh-cheatsheet` to your plugin list in `~/.zshrc`:
-
+2. Add `zsh-cheatsheet` to your plugins list in `~/.zshrc`:
    ```zsh
    plugins=(... zsh-cheatsheet)
    ```
-
-3. Restart your terminal or source your config:
-
+3. Reload your configuration:
    ```zsh
    source ~/.zshrc
    ```
@@ -80,96 +55,91 @@ It is designed for speed, portability (macOS/Linux), and minimal friction.
 #### Manual Installation
 
 1. Clone the repository:
-
    ```zsh
    git clone https://github.com/Xav-Deb/zsh-cheatsheet.git ~/.zsh-cheatsheet
    ```
-
 2. Source the plugin in your `~/.zshrc`:
-
    ```zsh
    echo "source ~/.zsh-cheatsheet/zsh-cheatsheet.plugin.zsh" >> ~/.zshrc
    ```
 
 ---
 
-## Available Cheat Sheets
+## 📂 Project Structure
 
-The plugin includes context-aware help for the following categories:
-
-### 🛠️ Core Utils & Text
-
-`find`, `grep`, `sed`, `awk`, `tar`, `rsync`, `curl`
-
-### 🌐 Network & SSH
-
-`ssh`, `scp`, `lsof`, `nc`, `dig`
-
-### 💻 Dev & Productivity
-
-`git`, `docker`, `vim`, `tmux`, `zsh-cheatsheet`
-
-### 🐍 Languages
-
-`python`, `npm`, `go`
-
-### 🚀 Modern CLI & Ops
-
-`fd`, `rg`, `bat`, `fzf`, `kubectl`, `ansible`
+- `zsh-cheatsheet.plugin.zsh`: Main entry point (loading, keybindings).
+- `functions/`: Core logic for functions (`open`, `update`, `upgrade`).
+- `cheats/`: Markdown "database" of cheat sheets.
+- `test/`: Testing scripts and content validation.
+- `agents.md`: Development directives and source of truth for AI agents.
 
 ---
 
-## Roadmap & Status
+## ✨ Key Features
 
-### Current Progress
-
-- [x] **Project Architecture**: Core ZLE & function structure.
-- [x] **Content Validation**: Automated tests for Markdown compliance.
-- [x] **Fuzzy Engine**: Robust `fzf` integration with real-time filtering.
-- [x] **Context Awareness**: Multi-word detection and prefix matching.
-- [x] **Compatibility**: Oh-My-Zsh & standard Zsh support.
-- [x] **Update Mechanism**: CLI tools for sheet and plugin updates.
-
-### Future Ideas & Optimizations
-
-- [ ] **Enhanced UI**: Dynamic preview window using `bat` or `glow`.
-- [ ] **Alias Resolution**: Automatically resolve aliases (e.g., `g` -> `git`).
-- [ ] **Shell Completion**: Native Zsh completions for the `zsh-cheatsheet` CLI.
-- [ ] **Custom Sources**: Support for user-defined remote repositories.
-- [ ] **Local Quick Edit**: Instantly edit a cheat sheet during usage.
-- [ ] **Smart Ranking**: Prioritize most-used commands in the selection list.
+- 🏎️ **Speed**: Pure Zsh parsing; avoids heavy dependencies like grep, sed, or awk.
+- 🧠 **Contextual**: Typing `git` then the hotkey automatically opens `git.md`.
+- 🔍 **Fuzzy Search**: Powered by `fzf` with category filtering based on H2 headers.
+- ⌨️ **Auto-Insertion**: The selected command is inserted directly at the cursor position.
+- 🔄 **Auto-Update**: Built-in commands to update the database and the plugin itself.
 
 ---
 
-## Contributing
+## 🚦 Development Workflow
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create.
+Development follows iterative steps defined in the project plan:
+1. Skeleton definition and widget registration.
+2. Context detection implementation.
+3. `fzf` integration.
+4. Markdown parsing according to the contract.
+5. Command insertion logic.
+6. Fallback for global selection.
 
-1. **Fork** the Project.
-2. **Create** your Feature Branch (`git checkout -b feature/AmazingCheatSheet`).
-3. **Ensure** your file follows the [Markdown Contract](agents.md).
-4. **Confirm** with tests: `test/run.sh`.
-5. **Commit** your Changes (`git commit -m 'Add some AmazingCheatSheet'`).
-6. **Push** to the Branch.
-7. **Open** a Pull Request.
+Every new feature must be validated by the scripts in `test/`.
 
 ---
 
-## License
+## 📏 Coding Standards
+
+- **Prefer Zsh Builtins**: Use parameter expansion and internal pattern matching instead of external system calls.
+- **Portability**: Ensure support for both macOS and Linux (GNU/BSD compatibility).
+- **Buffer Safety**: Never clear the user's buffer without explicit action.
+- **Markdown Contract**:
+    - Exactly one `# <cmd>` header at the top.
+    - `## <Category>` sections for visual grouping.
+    - Entries formatted as `- \`command\` — description`.
+
+---
+
+## 🧪 Testing
+
+The project includes an automated test suite to ensure stability:
+
+- **Syntax Check**: `zsh -n` on all scripts.
+- **Content Validation**: Ensures all files in `cheats/` follow the Markdown contract.
+
+Run all tests with:
+
+```zsh
+./test/run.sh
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! To add or modify a cheat sheet:
+
+1. Review [agents.md](agents.md) to understand the Markdown contract.
+2. Add your file to the `cheats/` directory.
+3. Validate with `./test/run.sh`.
+4. Open a Pull Request.
+
+---
+
+## 📜 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/#Xav-Deb/zsh-cheatsheet&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Xav-Deb/zsh-cheatsheet&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Xav-Deb/zsh-cheatsheet&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=Xav-Deb/zsh-cheatsheet&type=date&legend=top-left" />
- </picture>
-</a>
 
 ---
 
