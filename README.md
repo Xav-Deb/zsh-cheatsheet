@@ -79,7 +79,6 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 - `functions/`: Core logic for functions (`open`, `update`, `upgrade`).
 - `cheats/`: Markdown "database" of cheat sheets.
 - `test/`: Testing scripts and content validation.
-- `agents.md`: Development directives and source of truth for AI agents.
 
 ---
 
@@ -140,13 +139,19 @@ Run all tests with:
 Contributions are welcome! To add or modify a cheat sheet:
 
 1. Review [agents.md](agents.md) to understand the Markdown contract.
-2. Add your file to the `cheats/` directory.
+2. Add youthe [Coding Standards](#-coding-standards) section` directory.
 3. Validate with `./test/run.sh`.
 4. Open a Pull Request.
 
 ---
 
-## 📜 License
+## � Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=Xav-Deb/zsh-cheatsheet&type=Date)](https://star-history.com/#Xav-Deb/zsh-cheatsheet&Date)
+
+---
+
+## �📜 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 

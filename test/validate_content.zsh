@@ -26,6 +26,16 @@ for file in cheats/*.md; do
     fi
 done
 
+# 3. Check Markdown syntax with markdownlint
+if (( $+commands[markdownlint] )); then
+    if ! markdownlint cheats/*.md; then
+        echo "❌ markdownlint found issues in cheats/"
+        errors=$((errors + 1))
+    fi
+else
+    echo "⚠️ markdownlint not installed. Skipping lint check."
+fi
+
 if [[ $errors -eq 0 ]]; then
     echo "✅ Content validation passed for all cheat sheets."
     exit 0
