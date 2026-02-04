@@ -138,8 +138,8 @@ Run all tests with:
 
 Contributions are welcome! To add or modify a cheat sheet:
 
-1. Review [agents.md](agents.md) to understand the Markdown contract.
-2. Add youthe [Coding Standards](#-coding-standards) section` directory.
+1. Review the [Coding Standards](#-coding-standards) section to understand the Markdown contract.
+2. Add your file to the `cheats/` directory.
 3. Validate with `./test/run.sh`.
 4. Open a Pull Request.
 
