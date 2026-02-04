@@ -1,11 +1,13 @@
 # zsh-cheatsheet-open widget function
 
 zsh-cheatsheet-open() {
-    emulate -L zsh
-    setopt extended_glob
-    
-    # Extract all words from the current line buffer
-    local words=("${(z)LBUFFER}")
+    # Isolate scope and disable debug traces
+    {
+        emulate -L zsh
+        setopt extended_glob NO_xtrace NO_verbose
+        
+        # Extract all words from the current line buffer
+        local words=("${(z)LBUFFER}")
     local selected=""
     local cheat_file=""
     local target_cmd=""
@@ -15,13 +17,13 @@ zsh-cheatsheet-open() {
 
     # 1. Detect Context: Find the first word that matches an existing cheat sheet
     if [[ ${#words} -gt 0 ]]; then
-        local w
-        for w in "${words[@]}"; do
-            local d
-            for d in $search_dirs; do
-                if [[ -f "$d/${w}.md" ]]; then
-                    cheat_file="$d/${w}.md"
-                    target_cmd="$w"
+        local _zsh_w
+        for _zsh_w in "${words[@]}"; do
+            local _zsh_d
+            for _zsh_d in $search_dirs; do
+                if [[ -f "$_zsh_d/${_zsh_w}.md" ]]; then
+                    cheat_file="$_zsh_d/${_zsh_w}.md"
+                    target_cmd="$_zsh_w"
                     break 2 # Found the command context
                 fi
             done
@@ -61,13 +63,13 @@ zsh-cheatsheet-open() {
     # 3. Global Fallback (only if no context found)
     if [[ -z "$cheat_file" ]]; then
         local all_entries=()
-        local d
-        for d in $search_dirs; do
-            [[ ! -d "$d" ]] && continue
-            local cheats=($d/*.md(N))
-            local file
-            for file in $cheats; do
-                local filename=$(basename "$file" .md)
+        local _zsh_d
+        for _zsh_d in $search_dirs; do
+            [[ ! -d "$_zsh_d" ]] && continue
+            local _zsh_cheats=($_zsh_d/*.md(N))
+            local _zsh_file
+            for _zsh_file in $_zsh_cheats; do
+                local filename=$(basename "$_zsh_file" .md)
                 local current_category="General"
                 while IFS= read -r line; do
                     if [[ "$line" =~ "^# " ]]; then
@@ -79,7 +81,7 @@ zsh-cheatsheet-open() {
                         local desc_part="${match[2]}"
                         all_entries+=("$filename [$current_category] - \`$cmd_part\` — $desc_part")
                     fi
-                done < "$file"
+                done < "$_zsh_file"
             done
         done
 
@@ -117,4 +119,5 @@ zsh-cheatsheet-open() {
 
     # Refresh the display to show the new buffer
     zle reset-prompt
+    }
 }
