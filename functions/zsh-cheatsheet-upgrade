@@ -19,10 +19,14 @@ zsh-cheatsheet-upgrade() {
             echo -n "Would you like to upgrade now? (y/N) "
             read -r opt
             if [[ "$opt" =~ ^[yY]$ ]]; then
-                git pull origin main
-                echo "✅ Plugin updated successfully."
-                # Reload functions after upgrade
-                zsh-cheatsheet reload
+                if git pull origin main; then
+                    echo "✅ Plugin updated successfully."
+                    # Reload functions after upgrade
+                    zsh-cheatsheet reload
+                else
+                    echo "❌ Error: Update failed. You may have local changes preventing the merge."
+                    echo "Check directory '$plugin_dir' to resolve conflicts."
+                fi
             fi
         else
             echo "✅ Plugin is already up to date."
