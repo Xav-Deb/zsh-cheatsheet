@@ -1,36 +1,31 @@
 # zsh-cheatsheet-open widget function
 
 zsh-cheatsheet-open() {
-    # Extract all words from the current line buffer and get the last one
+    # Extract all words from the current line buffer
     local words=("${(z)LBUFFER}")
-    local target_cmd="${words[-1]}"
-    local selected
+    local selected=""
+    local cheat_file=""
+    local target_cmd=""
     
     # Search paths for cheat sheets
     local search_dirs=("$ZSH_CHEATSHEET_CACHE/cheats" "$ZSH_CHEATSHEET_DIR/cheats")
-    local cheat_file=""
 
-    # 1. Search for a specific cheat sheet for the last word
-    if [[ -n "$target_cmd" ]]; then
-        local d
-        for d in $search_dirs; do
-            # Try exact match first
-            if [[ -f "$d/${target_cmd}.md" ]]; then
-                cheat_file="$d/${target_cmd}.md"
-                break
-            fi
-            # Try prefix match if no exact match found
-            local matches=($d/${target_cmd}*.md(N))
-            if [[ ${#matches} -gt 0 ]]; then
-                cheat_file="${matches[1]}"
-                # Update target_cmd to the actual found filename (without .md)
-                target_cmd=$(basename "$cheat_file" .md)
-                break
-            fi
+    # 1. Detect Context: Find the first word that matches an existing cheat sheet
+    if [[ ${#words} -gt 0 ]]; then
+        local w
+        for w in "${words[@]}"; do
+            local d
+            for d in $search_dirs; do
+                if [[ -f "$d/${w}.md" ]]; then
+                    cheat_file="$d/${w}.md"
+                    target_cmd="$w"
+                    break 2 # Found the command context
+                fi
+            done
         done
     fi
 
-    # 2. If found, show entries for that command
+    # 2. Contextual Search
     if [[ -n "$cheat_file" ]]; then
         local current_category="General"
         local entries=()
@@ -42,18 +37,26 @@ zsh-cheatsheet-open() {
             elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
                 local cmd_part="${match[1]}"
                 local desc_part="${match[2]}"
-                # Format: [Category] cmd — description (keep it searchable)
                 entries+=("[$current_category] - \`$cmd_part\` — $desc_part")
             fi
         done < "$cheat_file"
 
         if [[ ${#entries} -gt 0 ]]; then
             selected=$(printf "%s\n" "${entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="Cheat $target_cmd > ")
+            
+            # If user pressed Esc during context search, cancel everything.
+            if [[ -z "$selected" ]]; then
+                zle reset-prompt
+                return 0
+            fi
+        else
+            # Cheat sheet file exists but has no valid entries? Fallback to global.
+            cheat_file="" 
         fi
     fi
 
-    # 3. Fallback: show all available cheat sheets
-    if [[ -z "$selected" ]]; then
+    # 3. Global Fallback (only if no context found)
+    if [[ -z "$cheat_file" ]]; then
         local all_entries=()
         local d
         for d in $search_dirs; do
@@ -92,18 +95,15 @@ zsh-cheatsheet-open() {
             # Clean LBUFFER by removing trailing spaces
             local clean_lbuffer="${LBUFFER%% #}"
             
-            # Simple check: Does the start of cmd_to_insert match the end of clean_lbuffer?
-            # We want to replace the part that is already there.
-            
-            # Case 1: The current buffer is exactly the start of the command (or equal)
+            # Heuristic: Match logic for insertion
             if [[ -n "$clean_lbuffer" && "$cmd_to_insert" == "$clean_lbuffer"* ]]; then
+                 # Case 1: LBUFFER is a prefix of what we want to insert (e.g. "git sw" -> "git switch")
                 LBUFFER="${cmd_to_insert}"
-            # Case 2: The current command/prefix is part of the command chosen
-            # We check if the last word (target_cmd) is the beginning of cmd_to_insert
-            elif [[ -n "$target_cmd" && "$cmd_to_insert" == "$target_cmd"* ]]; then
-                # Get everything before target_cmd in clean_lbuffer
-                local prefix="${clean_lbuffer%$target_cmd}"
-                LBUFFER="${prefix}${cmd_to_insert}"
+            elif [[ -n "$target_cmd" && "$clean_lbuffer" == *"$target_cmd"* ]]; then
+                 # Case 2: We found a context command in LBUFFER, replace from there?
+                 # No, this is risky. Let's just append if no prefix match.
+                 [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
+                 LBUFFER+="${cmd_to_insert}"
             else
                 # Default: Append with space
                 [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
