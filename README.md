@@ -73,7 +73,58 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 
 ---
 
-## 📂 Project Structure
+## � Usage
+
+### Basic Interaction
+
+1. **Context-Aware Search**: Type a command (e.g., `git`) and press `Ctrl+H` (default). The plugin will detect the command and open the specific cheat sheet for `git`.
+
+   ```zsh
+   $ git <Ctrl+H>
+   ```
+
+2. **Global Search**: If the command line is empty or the command is not recognized, pressing `Ctrl+H` will open a searchable list of all available cheat sheets.
+
+3. **Navigation (fzf)**:
+   - Type to filter entries.
+   - Use `Up`/`Down` arrows or `Ctrl+K`/`Ctrl+J` to navigate results.
+   - Press `Enter` to select a command. The command will be **inserted under your cursor** in the terminal, ready to be edited or executed.
+   - Press `Esc` or `Ctrl+C` to close without inserting anything.
+
+### Customizing Keybinding
+
+The default keybinding is `^H` (Ctrl+H). To change it, define `ZSH_CHEATSHEET_BIND` **before** loading the plugin (or before `source ~/.zshrc` if using Oh-My-Zsh plugins) in your `.zshrc`:
+
+```zsh
+# Example: bind to Ctrl+O
+export ZSH_CHEATSHEET_BIND='^O'
+
+plugins=(... zsh-cheatsheet)
+```
+
+### Management Commands
+
+- **Reload**: If you modify a cheat sheet file manually, reload the plugin without restarting your shell:
+  ```zsh
+  zsh-cheatsheet reload
+  ```
+- **Update**: Fetch the latest cheat sheets (if configured with remote source) and plugin updates:
+  ```zsh
+  zsh-cheatsheet update   # Update database
+  zsh-cheatsheet upgrade  # Update plugin code
+  ```
+
+### 📸 Screenshots
+
+![Context Aware Search](docs/img/screenshot-context.png)
+*1. Type a command (e.g., `git`) to set the context.*
+
+![FZF Interface](docs/img/screenshot-fzf.png)
+*2. Press `Ctrl+H` to open the interactive cheat sheet, filter with fzf, and press Enter to insert.*
+
+---
+
+## �📂 Project Structure
 
 - `zsh-cheatsheet.plugin.zsh`: Main entry point (loading, keybindings).
 - `functions/`: Core logic for functions (`open`, `update`, `upgrade`).
