@@ -1,123 +1,118 @@
-# zsh-cheatsheet-open widget function
+# zsh-cheatsheet-open widget function (autoload body)
 
-zsh-cheatsheet-open() {
-    # Isolate scope and disable debug traces
-    {
-        emulate -L zsh
-        setopt extended_glob NO_xtrace NO_verbose
-        
-        # Extract all words from the current line buffer
-        local words=("${(z)LBUFFER}")
-    local selected=""
-    local cheat_file=""
-    local target_cmd=""
-    
-    # Search paths for cheat sheets
-    local search_dirs=("$ZSH_CHEATSHEET_CACHE/cheats" "$ZSH_CHEATSHEET_DIR/cheats")
+emulate -L zsh
+setopt extended_glob NO_xtrace NO_verbose
 
-    # 1. Detect Context: Find the first word that matches an existing cheat sheet
-    if [[ ${#words} -gt 0 ]]; then
-        local _zsh_w
-        for _zsh_w in "${words[@]}"; do
-            local _zsh_d
-            for _zsh_d in $search_dirs; do
-                if [[ -f "$_zsh_d/${_zsh_w}.md" ]]; then
-                    cheat_file="$_zsh_d/${_zsh_w}.md"
-                    target_cmd="$_zsh_w"
-                    break 2 # Found the command context
-                fi
-            done
-        done
-    fi
+# Extract all words from the current line buffer
+local words=("${(z)LBUFFER}")
+local selected=""
+local cheat_file=""
+local target_cmd=""
 
-    # 2. Contextual Search
-    if [[ -n "$cheat_file" ]]; then
-        local current_category="General"
-        local entries=()
-        while IFS= read -r line; do
-            if [[ "$line" =~ "^# " ]]; then
-                continue # Skip H1
-            elif [[ "$line" =~ "^## (.*)" ]]; then
-                current_category="${match[1]}"
-            elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
-                local cmd_part="${match[1]}"
-                local desc_part="${match[2]}"
-                entries+=("[$current_category] - \`$cmd_part\` — $desc_part")
-            fi
-        done < "$cheat_file"
+# Search paths for cheat sheets
+local search_dirs=("$ZSH_CHEATSHEET_CACHE/cheats" "$ZSH_CHEATSHEET_DIR/cheats")
 
-        if [[ ${#entries} -gt 0 ]]; then
-            selected=$(printf "%s\n" "${entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="Cheat $target_cmd > ")
-            
-            # If user pressed Esc during context search, cancel everything.
-            if [[ -z "$selected" ]]; then
-                zle reset-prompt
-                return 0
-            fi
-        else
-            # Cheat sheet file exists but has no valid entries? Fallback to global.
-            cheat_file="" 
-        fi
-    fi
-
-    # 3. Global Fallback (only if no context found)
-    if [[ -z "$cheat_file" ]]; then
-        local all_entries=()
+# 1. Detect Context: Find the first word that matches an existing cheat sheet
+if [[ ${#words} -gt 0 ]]; then
+    local _zsh_w
+    for _zsh_w in "${words[@]}"; do
         local _zsh_d
         for _zsh_d in $search_dirs; do
-            [[ ! -d "$_zsh_d" ]] && continue
-            local _zsh_cheats=($_zsh_d/*.md(N))
-            local _zsh_file
-            for _zsh_file in $_zsh_cheats; do
-                local filename=$(basename "$_zsh_file" .md)
-                local current_category="General"
-                while IFS= read -r line; do
-                    if [[ "$line" =~ "^# " ]]; then
-                        continue
-                    elif [[ "$line" =~ "^## (.*)" ]]; then
-                        current_category="${match[1]}"
-                    elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
-                        local cmd_part="${match[1]}"
-                        local desc_part="${match[2]}"
-                        all_entries+=("$filename [$current_category] - \`$cmd_part\` — $desc_part")
-                    fi
-                done < "$_zsh_file"
-            done
+            if [[ -f "$_zsh_d/${_zsh_w}.md" ]]; then
+                cheat_file="$_zsh_d/${_zsh_w}.md"
+                target_cmd="$_zsh_w"
+                break 2 # Found the command context
+            fi
         done
+    done
+fi
 
-        if [[ ${#all_entries} -gt 0 ]]; then
-            selected=$(printf "%s\n" "${all_entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="All Cheats > ")
+# 2. Contextual Search
+if [[ -n "$cheat_file" ]]; then
+    local current_category="General"
+    local entries=()
+    while IFS= read -r line; do
+        if [[ "$line" =~ "^# " ]]; then
+            continue # Skip H1
+        elif [[ "$line" =~ "^## (.*)" ]]; then
+            current_category="${match[1]}"
+        elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
+            local cmd_part="${match[1]}"
+            local desc_part="${match[2]}"
+            entries+=("[$current_category] - \`$cmd_part\` — $desc_part")
         fi
+    done < "$cheat_file"
+
+    if [[ ${#entries} -gt 0 ]]; then
+        selected=$(printf "%s\n" "${entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="Cheat $target_cmd > ")
+        
+        # If user pressed Esc during context search, cancel everything.
+        if [[ -z "$selected" ]]; then
+            zle reset-prompt
+            return 0
+        fi
+    else
+        # Cheat sheet file exists but has no valid entries? Fallback to global.
+        cheat_file="" 
     fi
+fi
 
-    # 4. Insert selected command
-    if [[ -n "$selected" ]]; then
-        # Extract command between backticks
-        local cmd_to_insert="${selected#*- \`}"
-        cmd_to_insert="${cmd_to_insert%%\`*}"
+# 3. Global Fallback (only if no context found)
+if [[ -z "$cheat_file" ]]; then
+    local all_entries=()
+    local _zsh_d
+    for _zsh_d in $search_dirs; do
+        [[ ! -d "$_zsh_d" ]] && continue
+        local _zsh_cheats=($_zsh_d/*.md(N))
+        local _zsh_file
+        for _zsh_file in $_zsh_cheats; do
+            local filename=$(basename "$_zsh_file" .md)
+            local current_category="General"
+            while IFS= read -r line; do
+                if [[ "$line" =~ "^# " ]]; then
+                    continue
+                elif [[ "$line" =~ "^## (.*)" ]]; then
+                    current_category="${match[1]}"
+                elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
+                    local cmd_part="${match[1]}"
+                    local desc_part="${match[2]}"
+                    all_entries+=("$filename [$current_category] - \`$cmd_part\` — $desc_part")
+                fi
+            done < "$_zsh_file"
+        done
+    done
 
-        if [[ -n "$cmd_to_insert" ]]; then
-            # Clean LBUFFER by removing trailing spaces
-            local clean_lbuffer="${LBUFFER%% #}"
-            
-            # Heuristic: Match logic for insertion
-            if [[ -n "$clean_lbuffer" && "$cmd_to_insert" == "$clean_lbuffer"* ]]; then
-                 # Case 1: LBUFFER is a prefix of what we want to insert (e.g. "git sw" -> "git switch")
-                LBUFFER="${cmd_to_insert}"
-            elif [[ -n "$target_cmd" && "$clean_lbuffer" == *"$target_cmd"* ]]; then
-                 # Case 2: We found a context command in LBUFFER, replace from there?
-                 # No, this is risky. Let's just append if no prefix match.
-                 [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
-                 LBUFFER+="${cmd_to_insert}"
-            else
-                # Default: Append with space
+    if [[ ${#all_entries} -gt 0 ]]; then
+        selected=$(printf "%s\n" "${all_entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="All Cheats > ")
+    fi
+fi
+
+# 4. Insert selected command
+if [[ -n "$selected" ]]; then
+    # Extract command between backticks
+    local cmd_to_insert="${selected#*- \`}"
+    cmd_to_insert="${cmd_to_insert%%\`*}"
+
+    if [[ -n "$cmd_to_insert" ]]; then
+        # Clean LBUFFER by removing trailing spaces
+        local clean_lbuffer="${LBUFFER%% #}"
+        
+        # Heuristic: Match logic for insertion
+        if [[ -n "$clean_lbuffer" && "$cmd_to_insert" == "$clean_lbuffer"* ]]; then
+                # Case 1: LBUFFER is a prefix of what we want to insert (e.g. "git sw" -> "git switch")
+            LBUFFER="${cmd_to_insert}"
+        elif [[ -n "$target_cmd" && "$clean_lbuffer" == *"$target_cmd"* ]]; then
+                # Case 2: We found a context command in LBUFFER, replace from there?
+                # No, this is risky. Let's just append if no prefix match.
                 [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
                 LBUFFER+="${cmd_to_insert}"
-            fi
+        else
+            # Default: Append with space
+            [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
+            LBUFFER+="${cmd_to_insert}"
         fi
     fi
+fi
 
-    # Refresh the display to show the new buffer
-    zle reset-prompt
-    }
-}
+# Refresh the display to show the new buffer
+zle reset-prompt
