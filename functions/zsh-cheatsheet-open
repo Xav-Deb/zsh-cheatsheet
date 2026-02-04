@@ -1,117 +1,95 @@
 # zsh-cheatsheet-open widget function (autoload body)
 
-# Disable tracing IMMEDIATELY for the whole function scope
-{
-    emulate -L zsh
-    setopt extended_glob NO_xtrace NO_verbose
+# 1. Désactivation immédiate et absolue du traçage
+builtin unsetopt xtrace verbose 2>/dev/null
 
-    # Extract all words from the current line buffer
+# 2. Encapsulation totale dans un bloc silencieux
+{
+    builtin emulate -L zsh
+    builtin setopt extended_glob local_options no_xtrace no_verbose
+
     local words=("${(z)LBUFFER}")
     local selected=""
     local cheat_file=""
     local target_cmd=""
-
-    # Search paths for cheat sheets
     local search_dirs=("$ZSH_CHEATSHEET_CACHE/cheats" "$ZSH_CHEATSHEET_DIR/cheats")
 
-    # 1. Detect Context: Find the first word that matches an existing cheat sheet
+    # Détection du contexte
     if [[ ${#words} -gt 0 ]]; then
-        local _zsh_w
-        for _zsh_w in "${words[@]}"; do
-            local _zsh_d
-            for _zsh_d in $search_dirs; do
-                if [[ -f "$_zsh_d/${_zsh_w}.md" ]]; then
-                    cheat_file="$_zsh_d/${_zsh_w}.md"
-                    target_cmd="$_zsh_w"
-                    break 2 # Found the command context
+        local w d_path
+        for w in "${words[@]}"; do
+            for d_path in "${search_dirs[@]}"; do
+                if [[ -f "$d_path/${w}.md" ]]; then
+                    cheat_file="$d_path/${w}.md"
+                    target_cmd="$w"
+                    break 2
                 fi
             done
         done
     fi
 
-    # 2. Contextual Search
+    # Recherche contextuelle
     if [[ -n "$cheat_file" ]]; then
-        local current_category="General"
+        local current_cat="General"
         local entries=()
         while IFS= read -r line; do
-            if [[ "$line" =~ "^# " ]]; then
-                continue # Skip H1
-            elif [[ "$line" =~ "^## (.*)" ]]; then
-                current_category="${match[1]}"
+            if [[ "$line" =~ "^## (.*)" ]]; then
+                current_cat="${match[1]}"
             elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
-                local cmd_part="${match[1]}"
-                local desc_part="${match[2]}"
-                entries+=("[$current_category] - \`$cmd_part\` — $desc_part")
+                entries+=("[$current_cat] - \`${match[1]}\` — ${match[2]}")
             fi
         done < "$cheat_file"
 
         if [[ ${#entries} -gt 0 ]]; then
             selected=$(printf "%s\n" "${entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="Cheat $target_cmd > ")
-            
-            # If user pressed Esc during context search, cancel everything.
             if [[ -z "$selected" ]]; then
-                zle reset-prompt
+                [ -n "$WIDGET" ] && zle reset-prompt
                 return 0
             fi
         else
-            # Cheat sheet file exists but has no valid entries? Fallback to global.
             cheat_file="" 
         fi
     fi
 
-    # 3. Global Fallback (only if no context found)
+    # Fallback global
     if [[ -z "$cheat_file" ]]; then
         local all_entries=()
-        local _zsh_d
-        for _zsh_d in $search_dirs; do
-            [[ ! -d "$_zsh_d" ]] && continue
-            local _zsh_cheats=($_zsh_d/*.md(N))
-            local _zsh_file
-            for _zsh_file in $_zsh_cheats; do
-                local filename=$(basename "$_zsh_file" .md)
-                local current_category="General"
+        local d_p f_p
+        for d_p in "${search_dirs[@]}"; do
+            [[ ! -d "$d_p" ]] && continue
+            for f_p in "$d_p"/*.md(N); do
+                local fname="${f_p:t:r}"
+                local cat="General"
                 while IFS= read -r line; do
-                    if [[ "$line" =~ "^# " ]]; then
-                        continue
-                    elif [[ "$line" =~ "^## (.*)" ]]; then
-                        current_category="${match[1]}"
+                    if [[ "$line" =~ "^## (.*)" ]]; then
+                        cat="${match[1]}"
                     elif [[ "$line" =~ "^- \`(.*)\` — (.*)" ]]; then
-                        local cmd_part="${match[1]}"
-                        local desc_part="${match[2]}"
-                        all_entries+=("$filename [$current_category] - \`$cmd_part\` — $desc_part")
+                        all_entries+=("$fname [$cat] - \`${match[1]}\` — ${match[2]}")
                     fi
-                done < "$_zsh_file"
+                done < "$f_p"
             done
         done
-
         if [[ ${#all_entries} -gt 0 ]]; then
             selected=$(printf "%s\n" "${all_entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="All Cheats > ")
         fi
     fi
 
-    # 4. Insert selected command
+    # Insertion
     if [[ -n "$selected" ]]; then
-        # Extract command between backticks
-        local cmd_to_insert="${selected#*- \`}"
-        cmd_to_insert="${cmd_to_insert%%\`*}"
-
-        if [[ -n "$cmd_to_insert" ]]; then
-            # Clean LBUFFER by removing trailing spaces
-            local clean_lbuffer="${LBUFFER%% #}"
-            
-            # Heuristic: Match logic for insertion
-            if [[ -n "$clean_lbuffer" && "$cmd_to_insert" == "$clean_lbuffer"* ]]; then
-                LBUFFER="${cmd_to_insert}"
-            elif [[ -n "$target_cmd" && "$clean_lbuffer" == *"$target_cmd"* ]]; then
-                [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
-                LBUFFER+="${cmd_to_insert}"
+        local cmd_to_ins="${selected#*- \`}"
+        cmd_to_ins="${cmd_to_ins%%\`*}"
+        if [[ -n "$cmd_to_ins" ]]; then
+            local clean_lb="${LBUFFER%% #}"
+            if [[ -n "$clean_lb" && "$cmd_to_ins" == "$clean_lb"* ]]; then
+                LBUFFER="${cmd_to_ins}"
             else
                 [[ -n "$LBUFFER" && "$LBUFFER" != *" " ]] && LBUFFER+=" "
-                LBUFFER+="${cmd_to_insert}"
+                LBUFFER+="${cmd_to_ins}"
             fi
         fi
     fi
 
-    # Refresh the display to show the new buffer
     [ -n "$WIDGET" ] && zle reset-prompt
 } 2>/dev/null
+
+
