@@ -80,7 +80,7 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 1. **Context-Aware Search**: Type a command (e.g., `git`) and press `Ctrl+H` (default). The plugin will detect the command and open the specific cheat sheet for `git`.
 
    ```zsh
-   $ git <Ctrl+H>
+   git <Ctrl+H>
    ```
 
 2. **Global Search**: If the command line is empty or the command is not recognized, pressing `Ctrl+H` will open a searchable list of all available cheat sheets.
@@ -105,13 +105,17 @@ plugins=(... zsh-cheatsheet)
 ### Management Commands
 
 - **Reload**: If you modify a cheat sheet file manually, reload the plugin without restarting your shell:
+
   ```zsh
   zsh-cheatsheet reload
   ```
+
 - **Update**: Fetch the latest cheat sheets (if configured with remote source) and plugin updates:
+
   ```zsh
   zsh-cheatsheet update   # Update database
   zsh-cheatsheet upgrade  # Update plugin code
+  source ~/.zshrc         # Reload configuration to apply all changes
   ```
 
 ### 📸 Screenshots
