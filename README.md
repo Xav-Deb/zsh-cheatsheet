@@ -40,14 +40,19 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 #### Via Oh-My-Zsh
 
 1. Clone the repository into your custom plugins folder:
+
    ```zsh
    git clone https://github.com/Xav-Deb/zsh-cheatsheet.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-cheatsheet
    ```
+
 2. Add `zsh-cheatsheet` to your plugins list in `~/.zshrc`:
+
    ```zsh
    plugins=(... zsh-cheatsheet)
    ```
+
 3. Reload your configuration:
+
    ```zsh
    source ~/.zshrc
    ```
@@ -55,10 +60,13 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 #### Manual Installation
 
 1. Clone the repository:
+
    ```zsh
    git clone https://github.com/Xav-Deb/zsh-cheatsheet.git ~/.zsh-cheatsheet
    ```
+
 2. Source the plugin in your `~/.zshrc`:
+
    ```zsh
    echo "source ~/.zsh-cheatsheet/zsh-cheatsheet.plugin.zsh" >> ~/.zshrc
    ```
@@ -88,6 +96,7 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 ## 🚦 Development Workflow
 
 Development follows iterative steps defined in the project plan:
+
 1. Skeleton definition and widget registration.
 2. Context detection implementation.
 3. `fzf` integration.
@@ -105,9 +114,9 @@ Every new feature must be validated by the scripts in `test/`.
 - **Portability**: Ensure support for both macOS and Linux (GNU/BSD compatibility).
 - **Buffer Safety**: Never clear the user's buffer without explicit action.
 - **Markdown Contract**:
-    - Exactly one `# <cmd>` header at the top.
-    - `## <Category>` sections for visual grouping.
-    - Entries formatted as `- \`command\` — description`.
+  - Exactly one `# <cmd>` header at the top.
+  - `## <Category>` sections for visual grouping.
+  - Entries formatted as `- \`command\` — description`.
 
 ---
 

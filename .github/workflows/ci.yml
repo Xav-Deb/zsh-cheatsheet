@@ -21,13 +21,13 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y zsh fzf shellcheck
+          sudo apt-get install -y zsh fzf
           sudo npm install -g markdownlint-cli
 
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
-          brew install zsh fzf shellcheck markdownlint-cli
+          brew install zsh fzf markdownlint-cli
 
       - name: Lint Markdown
         run: markdownlint cheats/*.md README.md
