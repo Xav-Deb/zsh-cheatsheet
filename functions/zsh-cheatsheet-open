@@ -1,6 +1,9 @@
 # zsh-cheatsheet-open widget function
 
 zsh-cheatsheet-open() {
+    emulate -L zsh
+    setopt extended_glob
+    
     # Extract all words from the current line buffer
     local words=("${(z)LBUFFER}")
     local selected=""
