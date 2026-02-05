@@ -202,7 +202,7 @@ Contributions are welcome! To add or modify a cheat sheet:
 
 ## � Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Xav-Deb/zsh-cheatsheet&type=Date)](https://star-history.com/#Xav-Deb/zsh-cheatsheet&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Xav-Deb/zsh-cheatsheet&type=date&legend=top-left)](https://www.star-history.com/#Xav-Deb/zsh-cheatsheet&type=date&legend=top-left)
 
 ---
 
