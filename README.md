@@ -73,7 +73,7 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 
 ---
 
-## � Usage
+## ⚙️ Usage
 
 ### Basic Interaction
 
@@ -128,7 +128,7 @@ plugins=(... zsh-cheatsheet)
 
 ---
 
-## �📂 Project Structure
+## 📂 Project Structure
 
 - `zsh-cheatsheet.plugin.zsh`: Main entry point (loading, keybindings).
 - `functions/`: Core logic for functions (`open`, `update`, `upgrade`).
@@ -200,13 +200,15 @@ Contributions are welcome! To add or modify a cheat sheet:
 
 ---
 
-## � Star History
+## ⭐ Star History
+
+## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=Xav-Deb/zsh-cheatsheet&type=date&legend=top-left)](https://www.star-history.com/#Xav-Deb/zsh-cheatsheet&type=date&legend=top-left)
 
 ---
 
-## �📜 License
+## 📜 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
