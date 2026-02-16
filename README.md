@@ -107,9 +107,9 @@ plugins=(... zsh-cheatsheet)
 
 When you request help for a command that doesn't have a dedicated `.md` file in the `cheats/` directory, the plugin automatically falls back to secondary sources:
 
-1.  **tldr** (Optional): If the [`tldr`](https://tldr.sh/) client is installed, the plugin parses its output to extract interactive commands.
-2.  **Man Pages**: If `tldr` isn't available, it parses the `man` page's **EXAMPLES** section to find usable command lines.
-3.  **App Help**: As a final resort, it provides a shortcut to the application's own `--help` command.
+1. **tldr** (Optional): If the [`tldr`](https://tldr.sh/) client is installed, the plugin parses its output to extract interactive commands.
+2. **Man Pages**: If `tldr` isn't available, it parses the `man` page's **EXAMPLES** section to find usable command lines.
+3. **App Help**: As a final resort, it provides a shortcut to the application's own `--help` command.
 
 All external entries are marked with a prefix in the search results: `[tldr]`, `[man]`, or `[help]`.
 
