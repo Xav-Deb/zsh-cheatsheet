@@ -34,6 +34,7 @@ The project follows a simple and high-performance architecture, prioritizing Zsh
 
 - **Zsh (5.8+)**
 - **fzf** installed and available in your `$PATH`.
+- **tldr** (Optional) for extended command coverage.
 
 ### Installation
 
@@ -102,6 +103,16 @@ export ZSH_CHEATSHEET_BIND='^O'
 plugins=(... zsh-cheatsheet)
 ```
 
+### 🧠 Intelligent Fallbacks
+
+When you request help for a command that doesn't have a dedicated `.md` file in the `cheats/` directory, the plugin automatically falls back to secondary sources:
+
+1. **tldr** (Optional): If the [`tldr`](https://tldr.sh/) client is installed, the plugin parses its output to extract interactive commands.
+2. **Man Pages**: If `tldr` isn't available, it parses the `man` page's **EXAMPLES** section to find usable command lines.
+3. **App Help**: As a final resort, it provides a shortcut to the application's own `--help` command.
+
+All external entries are marked with a prefix in the search results: `[tldr]`, `[man]`, or `[help]`.
+
 ### Management Commands
 
 - **Reload**: If you modify a cheat sheet file manually, reload the plugin without restarting your shell:
@@ -141,6 +152,7 @@ plugins=(... zsh-cheatsheet)
 
 - 🏎️ **Speed**: Pure Zsh parsing; avoids heavy dependencies like grep, sed, or awk.
 - 🧠 **Contextual**: Typing `git` then the hotkey automatically opens `git.md`.
+- ⚡ **Dynamic Fallbacks**: If no local cheat sheet exists, it automatically pulls data from `tldr`, `man` pages, or application `--help`.
 - 🔍 **Fuzzy Search**: Powered by `fzf` with category filtering based on H2 headers.
 - ⌨️ **Auto-Insertion**: The selected command is inserted directly at the cursor position.
 - 🔄 **Auto-Update**: Built-in commands to update the database and the plugin itself.
