@@ -18,6 +18,7 @@ builtin unsetopt xtrace verbose 2>/dev/null
     if [[ ${#words} -gt 0 ]]; then
         local w d_path
         for w in "${words[@]}"; do
+            # Priorité aux fichiers locaux
             for d_path in "${search_dirs[@]}"; do
                 if [[ -f "$d_path/${w}.md" ]]; then
                     cheat_file="$d_path/${w}.md"
@@ -25,13 +26,17 @@ builtin unsetopt xtrace verbose 2>/dev/null
                     break 2
                 fi
             done
+            # Si pas de fichier mais c'est une commande système valide, on la garde comme cible
+            if [[ -z "$target_cmd" ]] && (( $+commands[$w] )); then
+                target_cmd="$w"
+            fi
         done
     fi
 
     # Recherche contextuelle
+    local entries=()
     if [[ -n "$cheat_file" ]]; then
         local current_cat="General"
-        local entries=()
         while IFS= read -r line; do
             if [[ "$line" =~ "^## (.*)" ]]; then
                 current_cat="${match[1]}"
@@ -39,19 +44,76 @@ builtin unsetopt xtrace verbose 2>/dev/null
                 entries+=("[$current_cat] - \`${match[1]}\` — ${match[2]}")
             fi
         done < "$cheat_file"
-
-        if [[ ${#entries} -gt 0 ]]; then
-            selected=$(printf "%s\n" "${entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="Cheat $target_cmd > ")
-            if [[ -z "$selected" ]]; then
-                [ -n "$WIDGET" ] && zle reset-prompt
-                return 0
+    elif [[ -n "$target_cmd" ]]; then
+        # Fallback 1: tldr
+        if (( $+commands[tldr] )); then
+            local tldr_out
+            tldr_out=$(tldr "$target_cmd" 2>/dev/null)
+            if [[ -n "$tldr_out" ]]; then
+                local desc=""
+                # Nettoyage des codes couleurs ANSI
+                tldr_out="${tldr_out//(#b)$'\e'\[[0-9;](#c0,10)m/}"
+                while IFS= read -r line; do
+                    if [[ "$line" =~ "^- (.*):$" ]]; then
+                        desc="${match[1]}"
+                    elif [[ -n "$desc" && "$line" =~ "^[[:space:]]+(.*)" ]]; then
+                        entries+=("[tldr] - \`${match[1]}\` — $desc")
+                        desc=""
+                    fi
+                done <<< "$tldr_out"
             fi
-        else
-            cheat_file="" 
+        fi
+
+        # Fallback 2: man (Examples)
+        if [[ ${#entries} -eq 0 ]] && (( $+commands[man] )); then
+            local man_out
+            man_out=$(MANWIDTH=1000 man "$target_cmd" 2>/dev/null | col -b 2>/dev/null)
+            if [[ -n "$man_out" ]]; then
+                local line p=0 examples=()
+                while IFS= read -r line; do
+                    if [[ "$line" =~ "^(EXAMPLES|EXEMPLES|EXEMPLE)" ]]; then
+                        p=1; continue
+                    fi
+                    [[ $p -eq 1 && "$line" =~ "^[A-Z]" ]] && p=0
+                    [[ $p -eq 1 ]] && examples+="$line"
+                done <<< "$man_out"
+
+                if [[ ${#examples} -gt 0 ]]; then
+                    local desc=""
+                    for line in "${examples[@]}"; do
+                        [[ -z "${line// /}" ]] && continue
+                        if [[ "$line" =~ "^[[:space:]]{6,}([^[:space:]].*)" ]]; then
+                            local c="${match[1]}"
+                            c="${c#$ }"
+                            [[ -n "$desc" ]] && entries+=("[man] - \`${c}\` — $desc")
+                        elif [[ "$line" =~ "^[[:space:]]{1,5}([^[:space:]].*)" ]]; then
+                            desc="${match[1]}"
+                        fi
+                    done
+                fi
+            fi
+        fi
+
+        # Fallback 3: Aide de l'application (--help)
+        if [[ ${#entries} -eq 0 ]]; then
+            # On vérifie si la commande accepte --help
+            if "$target_cmd" --help >/dev/null 2>&1; then
+                entries+=("[help] - \`${target_cmd} --help\` — Afficher l'aide de l'application")
+            fi
         fi
     fi
 
-    # Fallback global
+    if [[ ${#entries} -gt 0 ]]; then
+        selected=$(printf "%s\n" "${entries[@]}" | fzf --height 40% --layout=reverse --border --prompt="Cheat $target_cmd > ")
+        if [[ -z "$selected" ]]; then
+            [ -n "$WIDGET" ] && zle reset-prompt
+            return 0
+        fi
+        # On marque qu'on a trouvé quelque chose pour éviter le fallback global
+        cheat_file="external"
+    fi
+
+    # Fallback global (si aucun contexte spécifique n'a donné de résultats)
     if [[ -z "$cheat_file" ]]; then
         local all_entries=()
         local d_p f_p
@@ -91,5 +153,3 @@ builtin unsetopt xtrace verbose 2>/dev/null
 
     [ -n "$WIDGET" ] && zle reset-prompt
 } 2>/dev/null
-
-
